@@ -1,0 +1,52 @@
+agency: fmwd
+legal_name: Foothill Municipal Water District
+verified_start_url: https://www.fmwd.com/home   # spec hint /board-meetings/ returns 500 "Not Found"
+robots_txt:
+  note: >
+    robots.txt disallows /uploads/ for all agents, and every board and committee PDF is served from
+    /uploads/files/. Patrick explicitly authorized overriding that Disallow for FMWD (2026-11-07).
+    Override is scoped to the /uploads/ prefix on www.fmwd.com only (config.py robots_override_prefixes).
+    All other crawl-politeness rules still apply (1 req/s, honest User-Agent, backoff).
+sources:
+  - name: Current board and committee agenda/packet pages
+    platform: custom CMS (static HTML, PDF links under /uploads/files/)
+    adapter: wbrag.adapters.fmwd
+    urls:
+      - https://www.fmwd.com/board-agenda-packet            # Board of Directors
+      - https://www.fmwd.com/ad-hoc-committee
+      - https://www.fmwd.com/engineering-and-om-committee
+      - https://www.fmwd.com/finance-committee
+      - https://www.fmwd.com/hazard-mitigation-committee
+      - https://www.fmwd.com/personnel-committee
+      - https://www.fmwd.com/water-resources-committee
+    earliest_seen: "2025-07-31 (hazard mitigation); board packets from 2026-01"
+    notes: >
+      Link text is just "Packet"; doc type and date come from the file name. Many file names carry
+      only month and year, so meeting_date is approximated to the first of the month
+      (date_precision=month). Agendas and packets are often merged into one PDF.
+  - name: Transparency, finance and plan reference pages
+    platform: custom CMS
+    adapter: wbrag.adapters.fmwd (parse_reference_page)
+    urls:
+      - https://www.fmwd.com/finance-management-reports
+      - https://www.fmwd.com/rates-charges
+      - https://www.fmwd.com/compensation
+      - https://www.fmwd.com/administration
+      - https://www.fmwd.com/disclosure
+      - https://www.fmwd.com/hazard-mitigation-plan
+      - https://www.fmwd.com/capital-improvements
+    notes: Budgets, rate schedules, compensation, admin code. Recorded under body "District Reference", undated.
+  - name: Board Meetings Archive / Committee Meetings Archive
+    platform: Google Drive folders
+    urls:
+      - https://drive.google.com/drive/folders/0Bw-okLLaGH9BOU5xSWJiNDVibGc
+      - https://drive.google.com/drive/folders/0Bw-okLLaGH9BdmM0Vlk0SXhock0
+    status: gated
+    notes: >
+      Embedded folder view returns HTTP 401 "Sign in to your Google Account". Not bypassed. This is
+      where pre-2026 FMWD records live, so FMWD history is incomplete until the District shares the
+      folders publicly or provides an export.
+  - name: Meeting Schedule
+    url: https://www.fmwd.com/meeting-schedule
+    notes: Schedule page; no document links found in static HTML.
+video: none found on the site

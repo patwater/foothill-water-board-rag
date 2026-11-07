@@ -1,0 +1,42 @@
+agency: cvwd
+legal_name: Crescenta Valley Water District
+identity_confirmed: >
+  cvwd.com pages are titled "... - Crescenta Valley Water District" (not Coachella cvwd.org or
+  Carpinteria cvwd.net).
+verified_start_url: https://www.cvwd.com/about-us/governance/board-meetings-agendas/   # spec hint returns 404
+robots_txt:
+  note: >
+    Crawling is allowed. Content-Signal: search=yes, ai-train=no, use=reference. ai-input (RAG) is not
+    stated, so the site neither grants nor restricts it. This corpus is retrieval-only and is never used
+    for training. Flagged for Patrick's review.
+sources:
+  - name: Meetings custom post type
+    platform: WordPress with ccsi-agendas-minutes plugin
+    adapter: wbrag.adapters.cvwd
+    listing: https://www.cvwd.com/wp-json/wp/v2/meetings   # id, link, title, category class_list (669 meetings)
+    detail: each meeting page (/meeting/<slug>/) has a date heading and Agenda / Minutes / Packet tiles
+    sitemap: https://www.cvwd.com/meeting-sitemap.xml
+    bodies: >
+      Board, Community Advisory, Community Relations, Emergency Planning, Employee Relations,
+      Engineering/Operations, Executive, Finance (and Policy), Policy, Technology committees
+      (meeting_category taxonomy).
+    notes: >
+      Page content is empty for older placeholder meetings; later ones have tiles. Post-publication dates
+      differ from the meeting date, so the date is taken from the page heading.
+  - name: Reference documents
+    platform: WordPress pages
+    urls:
+      - https://www.cvwd.com/about-us/who-we-are/transparency/
+      - https://www.cvwd.com/about-us/governance/strategic-plan/
+      - https://www.cvwd.com/about-us/news-information/hazard-mitigation-plan/
+  - name: WordPress media library
+    url: https://www.cvwd.com/wp-json/wp/v2/media
+    notes: >
+      1,686 PDFs, many not attached to a meeting (operational shutdown notices etc.). Not governing-body
+      records, so out of scope; meeting-attached files are reached through the meeting pages.
+video: none exposed on meeting pages
+staging_hosts: >
+  Meeting-page tiles link to the web developer's hosts (cvwd.ccsdesigns.com, wp.cvwd.ccsdesigns.com) for
+  955 of 1,094 documents. `python -m wbrag.mirrorcheck` HEADed the same path on www.cvwd.com: 947 of 949
+  checked files have the identical size, 0 are missing, and the 2 mismatches are dead-link HTML pages.
+  Raw files are kept as downloaded; source_url preserves the host the site actually linked to.
