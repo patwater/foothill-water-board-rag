@@ -1,0 +1,16 @@
+agency: glendale
+legal_name: City of Glendale, Glendale Water & Power
+run1_status: blocked (no documents fetched)
+probed: 2026-11-07
+findings:
+  - url: https://www.glendaleca.gov/government/agendas-minutes
+    result: HTTP 403 "Access Denied" from Akamai edge (errors.edgesuite.net) for the project User-Agent
+  - url: https://www.glendaleca.gov/robots.txt
+    result: HTTP 403 (same edge block), so robots rules cannot even be read
+  - url: https://glendale.granicus.com/robots.txt
+    result: reachable; `User-agent: *  Disallow: /` (no evidence Glendale publishes there)
+  - legistar: webapi.legistar.com/v1/{glendale,glendaleca} -> "LegistarConnectionString not set up" (Glendale does not use Legistar)
+notes: >
+  Never bypass a WAF or bot block (spec section 10). The GWP Commission and City Council bodies could not be
+  identified because the city's agenda pages are unreachable. Options: an explicit decision from Patrick, a
+  request to the City Clerk for an allowlist or export, or a California Public Records Act request.

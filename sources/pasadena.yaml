@@ -1,0 +1,18 @@
+agency: pasadena
+legal_name: City of Pasadena, Pasadena Water and Power
+run1_status: blocked (no documents fetched)
+probed: 2026-11-07
+findings:
+  - url: https://pasadena.granicus.com/ViewPublisher.php?view_id=2
+    result: HTTP 302 -> /panes/PermissionDenied.php (HTTP 403 "Permission Denied")
+  - url: https://pasadena.granicus.com/robots.txt
+    result: "`User-agent: *  Disallow: /` (only named search engines are allowed, with Crawl-delay 10)"
+  - url: https://www.cityofpasadena.net/
+    result: HTTP 403
+  - url: https://www.pasadenaca.gov/
+    result: connection failure (HTTP 000)
+  - legistar: webapi.legistar.com/v1/{pasadena,pasadenaca} -> "LegistarConnectionString not set up" (Pasadena does not use Legistar)
+notes: >
+  Two independent blocks: robots.txt forbids all crawlers on the Granicus host, and the publisher view itself
+  denies access. The body that oversees PWP (and its own view_id) could not be identified. The robots override
+  Patrick granted covers FMWD only and was not extended here.
