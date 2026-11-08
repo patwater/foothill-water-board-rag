@@ -41,5 +41,5 @@ AGENCIES = {
                  "hosts": ["pasadena.granicus.com"], "robots_override_prefixes": []},
     "burbank": {"name": "City of Burbank, Burbank Water and Power", "identity": ["burbank"],
                 "start": "https://burbank.granicus.com/ViewPublisher.php?view_id=6",
-                "hosts": ["burbank.granicus.com"], "robots_override_prefixes": []},
+                "hosts": ["burbank.granicus.com"], "robots_override_prefixes": ["/"]},  # user-authorized 2026-11-07, burbank.granicus.com only
 }

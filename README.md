@@ -29,3 +29,4 @@ pytest
 - **CVWD content signals:** cvwd.com sets `ai-train=no`; it does not state `ai-input`. This corpus is
   used for retrieval only, never for training.
 - Never bypass logins: FMWD's pre-2026 archive is in Google Drive folders that require sign-in, so it is `gated`.
+- **Burbank robots.txt override:** authorized for burbank.granicus.com only (BWP Board, recent meetings). Glendale and Pasadena remain blocked by access controls.

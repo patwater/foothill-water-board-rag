@@ -16,3 +16,7 @@ notes: >
   Two independent blocks: robots.txt forbids all crawlers on the Granicus host, and the publisher view itself
   denies access. The body that oversees PWP (and its own view_id) could not be identified. The robots override
   Patrick granted covers FMWD only and was not extended here.
+
+followup: >
+  2026-11-07 user chose to override Granicus robots; Pasadena's view still redirects to /panes/PermissionDenied.php
+  (403), an access control, so nothing was fetched and no override was configured.

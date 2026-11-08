@@ -1,6 +1,6 @@
 agency: burbank
 legal_name: City of Burbank, Burbank Water and Power
-run1_status: blocked (no documents fetched)
+run1_status: partial (BWP Board, 5 agendas + 2 minutes, Jul-Nov 2026 only)
 probed: 2026-11-07
 findings:
   - url: https://burbank.granicus.com/ViewPublisher.php?view_id=6
@@ -10,6 +10,14 @@ findings:
             "full agenda packets and meeting minutes are available on the Burbank City website"
   - url: https://www.burbankca.gov/web/city-clerks-office/meeting-agendas-and-minutes
     result: HTTP 403, Cloudflare "Just a moment..." bot challenge (robots.txt itself allows crawling)
+robots_override: >
+  Patrick authorized overriding robots.txt for burbank.granicus.com on 2026-11-07 (config.py). Scoped to that
+  host; the burbankca.gov Cloudflare challenge is not bypassed.
+adapter: wbrag.adapters.burbank
+coverage: >
+  Granicus RSS (view_id=6) lists only the newest ~100 city-wide items, so only recent BWP Board meetings are
+  reachable. Minutes are probed per agenda clip_id. Older history needs the archive search form (not built),
+  the City Clerk, or a Public Records Act request.
 notes: >
   Burbank's current records are on burbankca.gov behind a Cloudflare challenge, and the Granicus archive is
   robots-disallowed. Neither was bypassed. The BWP Board is the utility's own body; Council attachments are
