@@ -21,6 +21,13 @@ def detect(head: bytes) -> str:
         return "bin"
 
 
+def _text(page) -> str:
+    try:
+        return page.extract_text() or ""
+    except Exception:  # odd font encodings break extraction, not the file; treated as no text
+        return ""
+
+
 def identity_ok(text: str, agency: str) -> bool:
     t = re.sub(r"\s+", " ", text.lower())
     return any(n in t for n in config.AGENCIES[agency]["identity"])
@@ -50,7 +57,7 @@ def validate(path, url: str, agency: str, content_length: int | None) -> dict:
             n = len(r.pages)
             out["page_count"] = n
             idx = sorted({int(i * (n - 1) / 9) for i in range(10)}) if n > 10 else list(range(n))
-            texts = {i: (r.pages[i].extract_text() or "") for i in set(idx) | {0, min(1, n - 1)}}
+            texts = {i: _text(r.pages[i]) for i in set(idx) | {0, min(1, n - 1)}}
             sparse = sum(1 for i in idx if len(texts[i].strip()) < 50)
             out["needs_ocr"] = int(sparse > len(idx) / 2)
             head_text = " ".join(texts[i] for i in sorted(texts) if i < 2)

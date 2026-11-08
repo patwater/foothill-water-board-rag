@@ -24,6 +24,7 @@ def main():
     ap.add_argument("--agency", required=True, choices=list(config.AGENCIES))
     ap.add_argument("--limit", type=int)
     ap.add_argument("--refresh", action="store_true", help="download: revalidate ok rows via HEAD, add versions")
+    ap.add_argument("--source", choices=["fmwd-wayback"], help="enumerate: use a secondary source adapter")
     ap.add_argument("--no-head", action="store_true", help="enumerate: skip HEAD size estimates")
     a = ap.parse_args()
     if a.command == "preflight":
@@ -31,7 +32,7 @@ def main():
     elif a.command == "discover":
         print(f"see sources/{a.agency}.yaml (discovery is recorded by hand from fetched pages)")
     elif a.command == "enumerate":
-        print("new pending rows:", crawl.enumerate_agency(a.agency, a.limit, heads=not a.no_head))
+        print("new pending rows:", crawl.enumerate_agency(a.agency, a.limit, heads=not a.no_head and not a.source, source=a.source))
     elif a.command == "smoke":
         res, rows = crawl.smoke(a.agency)
         print(res)

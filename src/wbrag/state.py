@@ -8,7 +8,7 @@ FIELDS = ["doc_id", "version", "agency", "governing_body", "body_slug", "meeting
           "title", "source_url", "canonical_url", "provenance", "local_path", "content_sha256", "bytes",
           "content_type", "detected_type", "page_count", "http_status", "etag", "last_modified",
           "retrieved_at", "status", "status_detail", "identity_check", "needs_ocr", "duplicate_of",
-          "est_bytes", "snapshot_ts"]
+          "est_bytes", "snapshot_ts", "fetch_url"]
 
 SCHEMA = f"""CREATE TABLE IF NOT EXISTS docs (
   {', '.join(f + (' INTEGER' if f in ('version','bytes','page_count','http_status','needs_ocr','est_bytes') else ' TEXT') for f in FIELDS)},
@@ -39,6 +39,10 @@ def connect():
     db.execute("PRAGMA journal_mode=WAL")
     db.row_factory = sqlite3.Row
     db.executescript(SCHEMA)
+    have = {r[1] for r in db.execute("PRAGMA table_info(docs)")}
+    for f in FIELDS:
+        if f not in have:  # forward migration for databases created before a column existed
+            db.execute(f"ALTER TABLE docs ADD COLUMN {f} TEXT")
     return db
 
 
@@ -50,7 +54,7 @@ def upsert_pending(db, agency, item: dict) -> bool:
         return False
     row = {f: None for f in FIELDS}
     row.update(item, doc_id=did, version=1, agency=agency, canonical_url=canonical(url),
-               provenance="live", status="pending",
+               provenance=item.get("provenance", "live"), status="pending",
                body_slug=item.get("body_slug") or slug(item["governing_body"]))
     cols = [f for f in FIELDS if row[f] is not None]
     db.execute(f"INSERT INTO docs ({','.join(cols)}) VALUES ({','.join('?'*len(cols))})", [row[c] for c in cols])

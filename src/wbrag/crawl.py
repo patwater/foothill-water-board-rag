@@ -2,7 +2,9 @@
 import datetime as dt
 import hashlib
 import os
+import re
 import shutil
+from urllib.parse import unquote, urlsplit
 from . import config, state, validate
 from .adapters import ADAPTERS
 from .http import Client, HostFailing, RobotsBlocked
@@ -14,11 +16,15 @@ def now():
     return dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
 
 
-def enumerate_agency(agency, limit=None, heads=True):
+def enumerate_agency(agency, limit=None, heads=True, source=None):
     """Fill SQLite with pending rows; HEAD each new row for a size estimate and dead-link check."""
     db, client = state.connect(), Client(agency)
     new = 0
-    for item in ADAPTERS[agency].enumerate_items(client, limit):
+    adapter, kw = ADAPTERS[source or agency], {}
+    if source == "fmwd-wayback":
+        kw["held_paths"] = {re.sub(r"/{2,}", "/", unquote(urlsplit(r[0]).path)).lower() for r in
+                            db.execute("SELECT source_url FROM docs WHERE agency=?", (agency,))}
+    for item in adapter.enumerate_items(client, limit, **kw):
         new += state.upsert_pending(db, agency, item)
         if new % 25 == 0:
             db.commit()  # keep write transactions short so a parallel agency run is not blocked
@@ -58,11 +64,11 @@ def _target(row, version, ext):
 def fetch_row(db, client, row, version=None, extra_headers=None):
     """Download one document. Returns 'ok' | 'unchanged' | other status. Commits after the file."""
     version = version or row["version"]
-    did, url = row["doc_id"], row["source_url"]
+    did, url = row["doc_id"], row["fetch_url"] or row["source_url"]
     hdrs = dict(extra_headers or {})
-    if row["etag"] and row["status"] == "ok":
+    if row["etag"] and row["status"] == "ok" and row["provenance"] != "wayback":
         hdrs["If-None-Match"] = row["etag"]
-    if row["last_modified"] and row["status"] == "ok":
+    if row["last_modified"] and row["status"] == "ok" and row["provenance"] != "wayback":
         hdrs["If-Modified-Since"] = row["last_modified"]
 
     def upd(**kw):
@@ -117,7 +123,7 @@ def fetch_row(db, client, row, version=None, extra_headers=None):
     finally:
         r.close()
     sha = h.hexdigest()
-    v = validate.validate(tmp, url, row["agency"], int(cl) if cl and cl.isdigit() and not r.headers.get("Content-Encoding") else None)
+    v = validate.validate(tmp, row["source_url"], row["agency"], int(cl) if cl and cl.isdigit() and not r.headers.get("Content-Encoding") else None)
     common = dict(http_status=200, etag=r.headers.get("ETag"), last_modified=r.headers.get("Last-Modified"),
                   content_type=r.headers.get("Content-Type"), content_sha256=sha, bytes=n, retrieved_at=now(), **v)
     prev = db.execute("SELECT * FROM docs WHERE doc_id=? AND status IN ('ok','invalid') AND content_sha256 IS NOT NULL "

@@ -46,6 +46,19 @@ sources:
       Embedded folder view returns HTTP 401 "Sign in to your Google Account". Not bypassed. This is
       where pre-2026 FMWD records live, so FMWD history is incomplete until the District shares the
       folders publicly or provides an export.
+  - name: Internet Archive (Wayback Machine) captures of fmwd.com
+    platform: Wayback CDX index (web.archive.org/cdx), raw captures via /web/<ts>id_/<url>
+    adapter: wbrag.adapters.fmwd_wayback   # python -m wbrag enumerate --agency fmwd --source fmwd-wayback
+    provenance: wayback (snapshot timestamp in `snapshot_ts`; source_url is the original fmwd.com URL)
+    earliest_seen: "2005 (strategic plan); board packets from 2008-07"
+    notes: >
+      Recovers the pre-2026 history that the gated Google Drive archive would otherwise hold: ~175 dated
+      board, committee and finance packets/agendas from 2008 to 2025 (old paths /Resources/Documents/Board Packets/
+      and /resources/documents/, plus 2022-2025 /uploads/files/). 623 PDFs enumerated (~1.4 GB); case and port
+      variants of the same path are collapsed to the latest capture. Gaps remain (for example nothing dated
+      between 2016-02 and 2022-01, and no minutes at all); 13 captures return 404. About 360 non-governance
+      PDFs (conservation, press, forms) are filed under body "District Reference". Wayback copies sit in
+      authority tier 5 (spec section 7).
   - name: Meeting Schedule
     url: https://www.fmwd.com/meeting-schedule
     notes: Schedule page; no document links found in static HTML.
