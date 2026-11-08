@@ -1,48 +1,48 @@
-"""Burbank Water and Power Board records from the city's Granicus publisher (view_id=6).
+"""Burbank Water and Power Board records from the city's Granicus archive (view_id=6).
 
-Granicus RSS (agenda and minutes modes) lists the most recent ~100 items across all city bodies; only the
-"BWP Board Meeting" entries are kept. Viewer URLs 302 to /DocumentViewer.php?file=<id>.pdf. Older meetings
-need the archive search form, which is not implemented."""
+The archive search (ViewSearchResults.php) lists every archived meeting with its Agenda/Minutes links. The board
+appears under two names: "Burbank Water and Power Board ..." (2011 to 2024) and "BWP Board ..." (2019 on), so both
+are searched and de-duplicated by clip_id. Viewer URLs 302 to /DocumentViewer.php?file=<id>.pdf."""
 import re
 from datetime import datetime
 from html import unescape
 
 BASE = "https://burbank.granicus.com"
-FEED = BASE + "/ViewPublisherRSS.php?view_id=6&mode={mode}"
+SEARCH = BASE + "/ViewSearchResults.php"
+QUERIES = ("BWP", "Water and Power")
+NAME_RX = re.compile(r"^(BWP Board|Burbank Water and Power Board)", re.I)
 BODY = "BWP Board"
 
 
-def parse_feed(xml, mode):
-    for it in re.findall(r"<item>(.*?)</item>", xml, re.S):
-        title = unescape(re.search(r"<title>(.*?)</title>", it).group(1)).strip()
-        if not title.startswith("BWP Board Meeting"):
+def parse_results(html):
+    for row in re.findall(r"<tr onMouseOver.*?</tr>", html, re.S):
+        nm = re.search(r'id="([^"]*)" scope="rowgroup"', row)
+        dm = re.search(r">(\d\d/\d\d/\d\d)</td>", row)
+        if not nm or not dm:
             continue
-        m = re.search(r"-\s*(?:DARK\s*-\s*)?([A-Z][a-z]{2} \d{1,2}, \d{4})$", title)
-        if not m:
+        name = unescape(nm.group(1)).strip()
+        if not NAME_RX.match(name) or re.search(r"cancel", name, re.I):
             continue
-        date = datetime.strptime(m.group(1), "%b %d, %Y").date().isoformat()
-        clip = re.search(r"clip_id=(\d+)", it).group(1)
-        viewer = "AgendaViewer" if mode == "agenda" else "MinutesViewer"
-        yield dict(
-            governing_body=BODY, body_slug="bwp-board", meeting_key=f"bwp:{date}", meeting_date=date,
-            date_precision="day", meeting_type="regular", doc_type="agenda" if mode == "agenda" else "minutes_adopted",
-            title=f"{title} ({mode})", source_url=f"{BASE}/{viewer}.php?view_id=6&clip_id={clip}")
+        date = datetime.strptime(dm.group(1), "%m/%d/%y").date().isoformat()
+        special = "special" in name.lower()
+        for viewer, dtype in (("AgendaViewer", "agenda"), ("MinutesViewer", "minutes_adopted")):
+            m = re.search(rf"{viewer}\.php\?view_id=6&(?:amp;)?clip_id=(\d+)", row)
+            if m:
+                yield dict(
+                    governing_body=BODY, body_slug="bwp-board", meeting_key=f"bwp:{date}:{name}", meeting_date=date,
+                    date_precision="day", meeting_type="special" if special else "regular", doc_type=dtype,
+                    title=f"{name} ({dtype})", source_url=f"{BASE}/{viewer}.php?view_id=6&clip_id={m.group(1)}")
 
 
 def enumerate_items(client, limit=None):
-    n = 0
-    # the minutes feed rarely lists BWP, so minutes are probed per agenda clip (same clip_id)
-    r = client.get(FEED.format(mode="agenda"))
-    r.raise_for_status()
-    items = list(parse_feed(r.text, "agenda"))
-    items += [dict(i, doc_type="minutes_adopted", title=i["title"].replace("(agenda)", "(minutes)"),
-                   source_url=i["source_url"].replace("AgendaViewer", "MinutesViewer")) for i in items]
-    for mode in (None,):
-        for item in items:
-            # a meeting without minutes yet redirects to /panes/NoMinutes.php
-            final = client.head(item["source_url"]).url
-            if "/panes/No" in final:
+    seen, n = set(), 0
+    for q in QUERIES:
+        r = client.get(f"{SEARCH}?view_id=6&types[Clip]=on&allwords={q.replace(' ', '+')}")
+        r.raise_for_status()
+        for item in parse_results(r.text):
+            if item["source_url"] in seen:
                 continue
+            seen.add(item["source_url"])
             yield item
             n += 1
             if limit and n >= limit:
