@@ -20,3 +20,9 @@ followup_2026-11-08: >
   and a few joint Council/RDA meetings only. No water or power items, so nothing was downloaded and no robots
   override was configured. Current Council records are on glendaleca.gov (Akamai 403) and Legistar is not set
   up, so they remain blocked.
+followup_2026-11-08b: >
+  Searched for an open Glendale, CA equivalent of Pasadena's ww2 site. Found none. public.destinyhosted.com/glenddocs is
+  Glendale, Arizona (and its robots.txt disallows all), glendale.hosted.civiclive.com returns 403, the
+  glendaleca-redesign.prod.govaccess.org mirror times out, and www.glendaleca.gov (Akamai) returns 403. Note: one
+  Destiny Hosted PDF was fetched once during identification before its robots.txt and the AZ identity were
+  checked; it was not saved or used. Glendale remains blocked; the path forward is the City Clerk or a PRA request.
