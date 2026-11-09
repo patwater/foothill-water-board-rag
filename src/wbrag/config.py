@@ -37,8 +37,8 @@ AGENCIES = {
                  "start": "https://www.glendaleca.gov/government/agendas-minutes",
                  "hosts": ["www.glendaleca.gov"], "robots_override_prefixes": []},
     "pasadena": {"name": "City of Pasadena, Pasadena Water and Power", "identity": ["pasadena"],
-                 "start": "https://pasadena.granicus.com/ViewPublisher.php?view_id=2",
-                 "hosts": ["pasadena.granicus.com"], "robots_override_prefixes": []},
+                 "start": "https://ww2.cityofpasadena.net/",
+                 "hosts": ["ww2.cityofpasadena.net"], "robots_override_prefixes": []},
     "burbank": {"name": "City of Burbank, Burbank Water and Power", "identity": ["burbank"],
                 "start": "https://burbank.granicus.com/ViewPublisher.php?view_id=6",
                 "hosts": ["burbank.granicus.com"], "robots_override_prefixes": ["/"]},  # user-authorized 2026-11-07, burbank.granicus.com only

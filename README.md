@@ -29,4 +29,5 @@ pytest
 - **CVWD content signals:** cvwd.com sets `ai-train=no`; it does not state `ai-input`. This corpus is
   used for retrieval only, never for training.
 - Never bypass logins: FMWD's pre-2026 archive is in Google Drive folders that require sign-in, so it is `gated`.
-- **Burbank robots.txt override:** authorized for burbank.granicus.com only (BWP Board, 2012 to 2026 via the archive search). Glendale and Pasadena remain blocked by access controls.
+- **Burbank robots.txt override:** authorized for burbank.granicus.com only (BWP Board, 2012 to 2026 via the archive search). Glendale remains blocked by access controls.
+- **Pasadena:** City Council water and power items come from ww2.cityofpasadena.net (no robots.txt); see `sources/pasadena.yaml`.

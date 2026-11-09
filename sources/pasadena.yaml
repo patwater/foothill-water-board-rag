@@ -1,26 +1,27 @@
 agency: pasadena
 legal_name: City of Pasadena, Pasadena Water and Power
-run1_status: blocked (no documents fetched)
-probed: 2026-11-07
-findings:
-  - url: https://pasadena.granicus.com/ViewPublisher.php?view_id=2
-    result: HTTP 302 -> /panes/PermissionDenied.php (HTTP 403 "Permission Denied")
-  - url: https://pasadena.granicus.com/robots.txt
-    result: "`User-agent: *  Disallow: /` (only named search engines are allowed, with Crawl-delay 10)"
-  - url: https://www.cityofpasadena.net/
-    result: HTTP 403
-  - url: https://www.pasadenaca.gov/
-    result: connection failure (HTTP 000)
-  - legistar: webapi.legistar.com/v1/{pasadena,pasadenaca} -> "LegistarConnectionString not set up" (Pasadena does not use Legistar)
-notes: >
-  Two independent blocks: robots.txt forbids all crawlers on the Granicus host, and the publisher view itself
-  denies access. The body that oversees PWP (and its own view_id) could not be identified. The robots override
-  Patrick granted covers FMWD only and was not extended here.
-
-followup: >
-  2026-11-07 user chose to override Granicus robots; Pasadena's view still redirects to /panes/PermissionDenied.php
-  (403), an access control, so nothing was fetched and no override was configured.
-followup_2026-11-08: >
-  Requested: City Council items on water and power. Re-probed pasadena.granicus.com (PermissionDenied 403 on
-  every view and on RSS/search), cityofpasadena.net (403, even robots.txt) and pasadena.legistar.com (not set
-  up). All are access controls; nothing was fetched.
+run1_status: ok for City Council water and power items (1,744 docs, 2000-11 to 2026-11) via ww2.cityofpasadena.net
+verified_start_url: https://ww2.cityofpasadena.net/
+source:
+  platform: city IT's "City Council Agendas & Minutes" site (classic ASP; year pages /?year=YYYY, 1998 to 2026)
+  adapter: wbrag.adapters.pasadena
+  robots: none (robots.txt returns 404, so crawling is allowed)
+  search: Google Custom Search embed (search.php), not scraped; the adapter reads agenda pages directly
+selection: >
+  Per agenda page, each numbered item's heading is tested. strong = Water and Power department tag / "PWP" /
+  "water and power"; weak = specific water or power topics (water rates, supply shortage, Urban Water Management,
+  Light and Power ordinances, power purchase/sales, hydroelectric, recycled water, undergrounding, MWD ...),
+  with "Recommendation" boilerplate and contractor names like "Select Electric, Inc." ignored. The match is
+  recorded per row in status_detail. Every staff report, attachment and resolution of a matched item is kept,
+  plus the City Council minutes for each meeting that has a match.
+coverage: >
+  458 meetings. About 695 strong and 515 weak item matches. Weak matches are heuristic: expect some false
+  positives (budget or franchise items that name a utility) and some misses (items that never use these terms).
+  Older years (before about 2016) name files like 4A4.pdf, stored as doc_type "other".
+quality: >
+  1 minutes file and 1 vacancy-notice link are dead (404). 70 PDFs fail the identity check (no "Pasadena" in the
+  first two pages, mostly attachments) and 464 have no text layer (need OCR). Downloaded: about 3.7 GB.
+not_reached: >
+  pasadena.granicus.com (Permission Denied 403 on every view, RSS and search), www.cityofpasadena.net (403, even
+  robots.txt) and pasadena.legistar.com (not set up) are access controls and were not bypassed. Commission and
+  Pasadena Water and Power oversight-body records are not covered.
