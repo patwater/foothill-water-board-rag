@@ -3,7 +3,7 @@ import argparse
 import json
 import shutil
 import requests
-from . import config, crawl, export, verify, state
+from . import chunk, config, crawl, export, extract, verify, state
 
 
 def preflight(agency):
@@ -20,7 +20,7 @@ def preflight(agency):
 
 def main():
     ap = argparse.ArgumentParser(prog="wbrag")
-    ap.add_argument("command", choices=["preflight", "discover", "smoke", "enumerate", "download", "verify", "export"])
+    ap.add_argument("command", choices=["preflight", "discover", "smoke", "enumerate", "download", "verify", "export", "extract", "chunk"])
     ap.add_argument("--agency", required=True, choices=list(config.AGENCIES))
     ap.add_argument("--limit", type=int)
     ap.add_argument("--refresh", action="store_true", help="download: revalidate ok rows via HEAD, add versions")
@@ -40,6 +40,10 @@ def main():
             print(json.dumps(r))
     elif a.command == "download":
         print(crawl.download_agency(a.agency, a.limit, a.refresh))
+    elif a.command == "extract":
+        print(extract.run(a.agency, a.limit))
+    elif a.command == "chunk":
+        print(chunk.run(a.agency, a.limit))
     elif a.command == "export":
         print(export.export(a.agency))
     elif a.command == "verify":

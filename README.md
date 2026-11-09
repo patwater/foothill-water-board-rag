@@ -1,7 +1,7 @@
 # water-board-rag
 
 Citation-grounded RAG over the public board records of five Los Angeles area water agencies.
-The full pipeline spec is in [`spec.md`](spec.md). This repo currently implements stages 1 to 6
+The full pipeline spec is in [`spec.md`](spec.md). This repo currently implements stages 1 to 8
 (preflight, discover, smoke test, enumerate, download, verify) for **FMWD** and **CVWD**.
 Extraction, chunking, indexing and answering (`extract.py`, `chunk.py`, `index.py`, `answer.py`) are stubs.
 
@@ -31,3 +31,4 @@ pytest
 - Never bypass logins: FMWD's pre-2026 archive is in Google Drive folders that require sign-in, so it is `gated`.
 - **Burbank robots.txt override:** authorized for burbank.granicus.com only (BWP Board, 2012 to 2026 via the archive search). Glendale remains blocked by access controls.
 - **Pasadena:** City Council water and power items come from ww2.cityofpasadena.net (no robots.txt); see `sources/pasadena.yaml`.
+- **Extract and chunk:** `python -m wbrag extract --agency X` then `chunk --agency X` write `data/text/` and `data/chunks/` (gitignored). See `reports/extract-chunk-run1.md`.
