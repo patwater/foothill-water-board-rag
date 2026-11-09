@@ -14,3 +14,9 @@ notes: >
   Never bypass a WAF or bot block (spec section 10). The GWP Commission and City Council bodies could not be
   identified because the city's agenda pages are unreachable. Options: an explicit decision from Patrick, a
   request to the City Clerk for an allowlist or export, or a California Public Records Act request.
+followup_2026-11-08: >
+  Requested: City Council items on water and power. glendale.granicus.com views 2 and 3 are reachable, but
+  the archive stops at 2020-04-16 and holds Arts and Culture Commission, Redevelopment Agency, Oversight Board
+  and a few joint Council/RDA meetings only. No water or power items, so nothing was downloaded and no robots
+  override was configured. Current Council records are on glendaleca.gov (Akamai 403) and Legistar is not set
+  up, so they remain blocked.

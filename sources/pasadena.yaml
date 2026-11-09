@@ -20,3 +20,7 @@ notes: >
 followup: >
   2026-11-07 user chose to override Granicus robots; Pasadena's view still redirects to /panes/PermissionDenied.php
   (403), an access control, so nothing was fetched and no override was configured.
+followup_2026-11-08: >
+  Requested: City Council items on water and power. Re-probed pasadena.granicus.com (PermissionDenied 403 on
+  every view and on RSS/search), cityofpasadena.net (403, even robots.txt) and pasadena.legistar.com (not set
+  up). All are access controls; nothing was fetched.
